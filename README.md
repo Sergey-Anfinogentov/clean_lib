@@ -6,4 +6,4 @@ This project contains the sample library of the [CLEAN deconvolution algorithm](
 
 Python3, numpy, PIL (Python Imaging Library), scipy, astropy (for reading FITS file format).
 
-See examples of usage in <Overview.ipynb>
+See examples of usage in [Overview.ipynb](Overview.ipynb)
