@@ -204,7 +204,7 @@ def makeCleanBigPSF(dirtysource, psf, cleanblurradius, bottomlimit, maxit, gamma
         maxvalue = sourcebytes[y][x]
         if maxvalue <= criticalbottom:
             break
-        print(maxvalue)
+       # print(maxvalue)
 
         x0, x1 = (psfmx - x, psfmx - x + imgx)
         y0, y1 = (psfmy - y, psfmy - y + imgy)
@@ -219,15 +219,27 @@ def makeCleanBigPSF(dirtysource, psf, cleanblurradius, bottomlimit, maxit, gamma
         sourcebytes -= psf_slice * k
         cleanPoints[y][x] += psfsum * k
 
-        if (it % 10) == 0:
-            cleansum = np.sum(cleanPoints)
-            dirtysum2 = np.sum(sourcebytes)
-            print("full = {0}, sourcepic = {1}, it = {2}"
-                  .format(cleansum + dirtysum2, dirtysum, it))
+       # if (it % 10) == 0:
+       #     cleansum = np.sum(cleanPoints)
+        #    dirtysum2 = np.sum(sourcebytes)
+       #     print("full = {0}, sourcepic = {1}, it = {2}"
+       #           .format(cleansum + dirtysum2, dirtysum, it))
 
         it += 1
-    print("iterations: {0}".format(it))
+    #print("iterations: {0}".format(it))
     
     cleanPoints = gaussian_filter(cleanPoints, sigma=cleanblurradius)
 
     return cleanPoints, sourcebytes
+
+def cleanFits(image_file, psf_file):
+    dirtysource = getfits(image_file)
+    criticalbottom = np.percentile(dirtysource,95)
+    print(criticalbottom)
+    psf = getfits(psf_file)
+    psf = fix_psf(psf)
+    bottomlimit = 0.00
+    clean, dirtyoutput = makeCleanBigPSF(dirtysource, psf, 3.0, bottomlimit, criticalbottom=criticalbottom,\
+                                     maxit=500, gamma=0.1)
+    writefits("clean.fits", clean + dirtyoutput)
+    print(np.max(dirtyoutput))
