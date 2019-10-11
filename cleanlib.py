@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from PIL import Image
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import astropy.io.fits as fits
@@ -103,8 +102,7 @@ def make_psf_for(size):
 
     psfshape = tuple((i * 2 + 1 for i in size))
     
-    psfImage = Image.new("F", psfshape, 0)
-    psf = np.array(psfImage, dtype = np.float64)
+    psf = np.zeros(psfshape)
 
     for y in range(0, psf.shape[0]):
         for x in range(0, psf.shape[1]):
@@ -131,8 +129,8 @@ def makeClean(dirtysource, psf, cleanblurradius, bottomlimit, maxit, gamma = 0.1
 
     dirtysum = np.sum(sourcebytes)
 
-    cleanImage = Image.new("F", (imgbx, imgby), 0)
-    cleanPoints = np.array(cleanImage, dtype=np.float64)
+
+    cleanPoints = np.ones((imgbx, imgby))
 
     psfsum = np.sum(psf)
     
@@ -195,7 +193,7 @@ def makeCleanBigPSF(dirtysource, psf, cleanblurradius, bottomlimit, maxit, gamma
     sourcebytes = dirtysource.copy()
     dirtysum = np.sum(sourcebytes)
 
-    cleanImage = Image.new("F", (imgy, imgx), 0)
+    cleanImage = np.zeros((imgx,imgy))
     cleanPoints = np.array(cleanImage, dtype=np.float64)
 
     it = 0
