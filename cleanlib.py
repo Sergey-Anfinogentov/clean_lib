@@ -29,7 +29,11 @@ def fix_psf(psf):
     размер итоговой картинки получается НЕчётный
     пока работает не идеально
     """
-    maxpoint = np.unravel_index(psf.argmax(), psf.shape)
+    shape = psf.shape
+    mask = np.zeros(shape)
+    mask[shape[0]//4:shape[0]//4*3,shape[1]//4:shape[1]//4*3] =1.
+    masked_psf = psf*mask
+    maxpoint = np.unravel_index(masked_psf.argmax(), psf.shape)
     mpx, mpy = maxpoint[:2]
         
     new_shape = (mpx * 2 + 1 - psf.shape[0], mpy * 2 + 1 - psf.shape[1])
@@ -239,7 +243,7 @@ def cleanFits(image_file, psf_file):
     psf = getfits(psf_file)
     psf = fix_psf(psf)
     bottomlimit = 0.00
-    clean, dirtyoutput = makeCleanBigPSF(dirtysource, psf, 3.0, bottomlimit, criticalbottom=criticalbottom,\
+    clean, dirtyoutput = makeCleanBigPSF(dirtysource, psf, 12.0, bottomlimit, criticalbottom=criticalbottom,\
                                      maxit=500, gamma=0.1)
     writefits("clean.fits", clean + dirtyoutput)
     print(np.max(dirtyoutput))
